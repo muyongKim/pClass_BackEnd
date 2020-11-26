@@ -4,9 +4,10 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
 const userSchema = mongoose.Schema({
-    firstname: String,
-    lastname: String,
+    name: String,
     token: String,
+    p_list: Array,
+    sub_list: Array,
     
     email: {
         type: String,
@@ -21,7 +22,7 @@ const userSchema = mongoose.Schema({
    
     role: {
         type: Number,
-        default: 0      // 0 : 학생     1 : 강의자
+        default: 0      // 0 : 학생  1 : 강의자
     }
 })
 
@@ -62,7 +63,6 @@ userSchema.methods.generateToken = function(cb) {
         cb(null, user);
     })
 }
-
 
 const User = mongoose.model('User', userSchema);
 module.exports = { User };

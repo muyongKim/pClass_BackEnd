@@ -23,6 +23,10 @@ server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true}));
 
+
+// -------------------------api---------------------------------
+
+
 // 회원가입
 server.post('/api/users/register', (req, res) => {
     const user = new User(req.body);
