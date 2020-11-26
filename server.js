@@ -3,6 +3,7 @@ const server = express();
 const port = 4000;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const { User } = require("./schema/User");
 
 // 데이터베이스 연결
@@ -15,12 +16,13 @@ mongoose.connect('mongodb+srv://dbUser:9282@mycluster.1og6o.mongodb.net/pClassDB
 server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true}));
+server.use(cors());
 
 // 회원가입
 server.post('/api/users/register', (req, res) => {
     const user = new User(req.body);
     user.save((err, user) => {
-        if(err) return res.json({ success: false, err})
+        if (err) return res.json({ success: false, err})
         return res.status(200).json({ success: true })
     })
 })
@@ -48,6 +50,15 @@ server.post('/api/users/login', (req, res) => {
                     .json({ loginSuccess: true, userId: user._id })
              })   
         })
+    })
+})
+
+// 모든 유저 데이터 조회
+server.get('/api/users/all', function(req,res) {
+    const user = new User();
+    User.find(function(err, user) {
+        if (err) return res.status(400).send(err);
+        res.json(user);
     })
 })
 
