@@ -1,0 +1,13 @@
+{
+    "name": "pclass",
+    "version": "0.1.0",
+    "private": "true",
+    "dependencies": {
+        "mongoose": "^5.10.16",
+        "bcrypt": "^5.0.0",
+        "jsonwebtoken": "^8.5.1",
+        "express": "^4.17.1",
+        "body-parser": "^1.19.0",
+        "cookie-parser": "^1.4.5"
+    }
+}
