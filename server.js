@@ -13,10 +13,15 @@ mongoose.connect('mongodb+srv://dbUser:9282@mycluster.1og6o.mongodb.net/pClassDB
 }).then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
+// CORS policy 해결
+let corsOption = {
+    origin: 'http://localhost:3000',
+    credentials: true
+}
+server.use(cors(corsOption));
 server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true}));
-server.use(cors());
 
 // 회원가입
 server.post('/api/users/register', (req, res) => {
