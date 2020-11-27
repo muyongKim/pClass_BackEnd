@@ -10,14 +10,14 @@ const projectSchema = mongoose.Schema({
         {
             username: String,
             content: String,
-            time: Number
+            time: String
         }
     ],
 
     notification: [
         {
             content: String,
-            time: Number
+            time: String
         }
     ],
 
@@ -34,7 +34,7 @@ const projectSchema = mongoose.Schema({
                 {
                     username: String,
                     content: String,
-                    time: Number
+                    time: String
                 }
             ]
         }

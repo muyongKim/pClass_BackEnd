@@ -6,10 +6,19 @@ const mongoose = require('mongoose');
 // })
 
 const subjectSchema = mongoose.Schema({
-    subjectname: String,
+    subjectname: {
+        type: String,
+        trim: true
+    },
+    
     p_list: Array,
-    sub_id: String,
-    professor: String
+    professor: String,
+
+    sub_id: {
+        type: String,
+        trim: true,
+        unique: 1
+    }
 })
 
 const Subject = mongoose.model('Subject', subjectSchema);
