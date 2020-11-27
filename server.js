@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { User } = require("./schema/User");
+const { Project } = require("./schema/Project");
+const { Subject } = require("./schema/Subject");
 
 // 데이터베이스 연결
 const mongoose = require('mongoose');
@@ -22,6 +24,9 @@ server.use(cors(corsOption));
 server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true}));
+
+// 터미널에 포트 번호 출력
+server.listen(port, () => console.log(`Listening on port ${port}`));
 
 
 // -------------------------api---------------------------------
@@ -54,9 +59,9 @@ server.post('/api/users/login', (req, res) => {
              user.generateToken((err, user) => {
                  if (err) return res.status(400).send(err);
                     
-                 res.cookie("x_auth", user.token)
-                    .status(200)
-                    .json({ loginSuccess: true, userId: user._id })
+                 return res.cookie("x_auth", user.token)
+                        .status(200)
+                        .json({ loginSuccess: true, userId: user._id, email: user.email, name: user.name })
              })   
         })
     })
@@ -71,5 +76,10 @@ server.get('/api/users/all', function(req,res) {
     })
 })
 
-// 터미널에 포트 번호 출력
-server.listen(port, () => console.log(`Listening on port ${port}`));
+server.post('/api/subject/test', (req, res) => {
+    const subject = new Subject(req.body);
+    subject.save((err, subject) => {
+        if (err) return res.json({ success: false, err})
+        return res.status(200).json({ success: true })
+    })
+})

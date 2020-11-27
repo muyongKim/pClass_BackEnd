@@ -11,3 +11,6 @@ const subjectSchema = mongoose.Schema({
     sub_id: String,
     professor: String
 })
+
+const Subject = mongoose.model('Subject', subjectSchema);
+module.exports = { Subject };
