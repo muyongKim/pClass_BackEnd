@@ -57,6 +57,49 @@ router.get('/api/subjectmenu', function(req, res) {
     })
 })
 
+// 과목의 개설된 프로젝트 표시
+router.get('/api/subjectmenu/:id', (req, res) => {
+    Subject.findById({_id: req.params.id}, function(err, subject) {
+        if (err) return res.status(400).send(err);
+        return res.json(subject);
+    })
+})
+  
+  //프로젝트 개설
+  router.post("/api/project/register", async (req, res) => {
+    const project = new Project({
+      projectname: req.body.projectname,
+      contributer: req.body.contributer,
+      leader: req.body.leader,
+      sub_id: req.body.sub_id
+    });
+    try {
+      const saveProject = await project.save();
+      res.json(saveProject);
+    } catch (err) {
+      res.status(400).send(err);
+    }
+  });
+  
+  //프로젝트 조회
+  router.get("/api/project", function(req, res) {
+    const project = new Project();
+    Project.find(function(err, project) {
+      if (err) return res.status(400).send(err);
+      return res.json(project);
+    });
+  });
+  
+  //프로젝트 삭제
+  router.delete("/api/project/:projectId", async (req, res) => {
+    try {
+      const removeProject = await Project.remove({ _id: req.params.projectId });
+      res.json(removeProject);
+    } catch (err) {
+      res.status(400).send(err);
+    }
+  });
+
 /* subject DB에 데이터 삽입
 router.post('/api/subject/test', (req, res) => {
     const subject = new Subject(req.body);
