@@ -10,7 +10,7 @@ router.post('/api/users/register', (req, res) => {
     const user = new User(req.body);
     user.save((err, user) => {
         if (err) return res.json({success: false, err})
-        return res.status(200).json({success: true })
+        return res.status(200).json({success: true})
     })
 })
 
@@ -41,10 +41,10 @@ router.post('/api/users/login', (req, res) => {
 })
 
 // 모든 유저 데이터 조회
-router.get('/api/users/all', function(req,res) {
+router.get('/api/users/all', function(req, res) {
     User.find(function(err, user) {
         if (err) return res.status(400).send(err);
-        return res.json(user);
+        return res.status(200).json(user);
     })
 })
 
@@ -58,10 +58,10 @@ router.get('/api/subjectmenu', function(req, res) {
 })
 
 // 과목의 개설된 프로젝트 표시
-router.get('/api/subjectmenu/:id', (req, res) => {
-    Subject.findById({_id: req.params.id}, function(err, subject) {
+router.get('/api/subjectmenu/:subjectId', (req, res) => {
+    Subject.findOne({sub_id: req.params.subjectId}, function(err, subject) {
         if (err) return res.status(400).send(err);
-        return res.json(subject);
+        return res.status(200).json(subject);
     })
 })
   
@@ -85,7 +85,7 @@ router.get('/api/subjectmenu/:id', (req, res) => {
   router.get("/api/project", function(req, res) {
     const project = new Project();
     Project.find(function(err, project) {
-      if (err) return res.status(400).send(err);
+      if (err) return res.status(400).send(err)
       return res.json(project);
     });
   });
@@ -123,19 +123,22 @@ router.post('/api/project/test', (req, res) => {
 // 알림 생성, 알림 불러오기, 팀원 초대, 프로젝트 나가기, 진행률, 참여율
 
 // 프로젝트 이름 변경
-router.put('/api/project/:id/settings/modifyname', (req, res) => {
-    Project.findByIdAndUpdate({_id: req.params.id}, req.body).then(function(){
-        Project.findOne({_id: req.params.id}, (err, project) => {
+router.put('/api/project/:projectId/settings/modifyname', (req, res) => {
+    Project.findByIdAndUpdate({_id: req.params.projectId}, req.body).then(function(){
+        Project.findOne({_id: req.params.proejctId}, (err, project) => {
             if (err) return res.json({success: false, err});
             return res.status(200).json({success: true, projectname: project.projectname});
         })
     })
 })
 
-// // 프로젝트 나가기
-// router.delete('/api/project/:id/settings/leaveproject'), (req, res) => {
-//     Project.findOneAndUpdate( {_id: req.param.id}, {$pull: {contributor: }})
-// }
+// 프로젝트 나가기
+router.put('/api/project/:projectId/settings/leaveproject'), (req, res) => {
+    Project.findByIdAndUpdate({_id: req.params.projectId}, {$pull: {contributor: req.body}}, (err, project) => {
+        if (err) return res.json({success: false, err});
+        return res.status(200).json({success: true});
+    })
+}
 
 // 알림 생성
 

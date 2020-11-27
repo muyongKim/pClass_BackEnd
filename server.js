@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 
 // DEFINE MODEL
 const { User } = require("./schema/User");
@@ -29,6 +31,14 @@ server.use(cors(corsOption));
 server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true}));
+
+// CONFIGURE SESSION
+// server.use(session({
+//   secret: 'sid',
+//   resave: false,
+//   saveUninitialized: true,
+//   store: new FileStore()
+// }));
 
 // IMPORT ROUTES
 const route = require('./routes/api');
