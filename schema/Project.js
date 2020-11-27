@@ -5,7 +5,12 @@ const projectSchema = mongoose.Schema({
     contributor: Array,
     leader: String,
     sub_id: String,
-
+   
+    projectreadme: {
+        type: String,
+        default: null
+    },
+    
     chatting: [ 
         {
             username: String,

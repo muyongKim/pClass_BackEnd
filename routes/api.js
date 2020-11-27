@@ -65,21 +65,36 @@ router.get('/api/subjectmenu/:subjectId', (req, res) => {
     })
 })
   
-  //프로젝트 개설
-  router.post("/api/project/register", async (req, res) => {
+//프로젝트 개설
+// router.post("/api/project/register", async (req, res) => {
+//     const project = new Project({
+//       projectname: req.body.projectname,
+//       projectreadme: req.body.projectreadme
+//     });
+//     try {
+//       const saveProject = await project.save();
+//       res.json(saveProject);
+//     } catch (err) {
+//       res.status(400).send(err);
+//     }
+//   });
+
+// 프로젝트 개설
+router.post("/api/project/register", (req, res) => {
     const project = new Project({
-      projectname: req.body.projectname,
-      contributer: req.body.contributer,
-      leader: req.body.leader,
-      sub_id: req.body.sub_id
+        projectname: req.body.projectname,
+        projectreadme: req.body.projectreadme,
+        leader: req.body.name
     });
-    try {
-      const saveProject = await project.save();
-      res.json(saveProject);
-    } catch (err) {
-      res.status(400).send(err);
-    }
-  });
+    
+    project.save();
+    User.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: req.body.projectname}}).then(function() {
+        Subject.findByIdAndUpdate({_id: req.body.subId}, {$push: {p_list: req.body.projectname}}, (err, subject) => {
+            if (err) return res.status(400).send(err);
+            return res.status(200).json({success: true});
+        })
+    })
+})
   
   //프로젝트 조회
   router.get("/api/project", function(req, res) {
@@ -100,32 +115,31 @@ router.get('/api/subjectmenu/:subjectId', (req, res) => {
     }
   });
 
-/* subject DB에 데이터 삽입
-router.post('/api/subject/test', (req, res) => {
-    const subject = new Subject(req.body);
-    subject.save((err, subject) => {
-        if (err) return res.json({success: false, err});
-        return res.status(200).json({success: true});
-    })
-})
-*/
+// //subject DB에 데이터 삽입
+// router.post('/api/subject/test', (req, res) => {
+//     const subject = new Subject(req.body);
+//     subject.save((err, subject) => {
+//         if (err) return res.json({success: false, err});
+//         return res.status(200).json({success: true});
+//     })
+// })
 
-/* project DB에 데이터 삽입
-router.post('/api/project/test', (req, res) => {
-    const project = new Project(req.body);
-    project.save((err, project) => {
-        if (err) return res.json({success: false, err});
-        return res.status(200).json({success: true});
-    })
-})
-*/
+// // project DB에 데이터 삽입
+// router.post('/api/project/test', (req, res) => {
+//     const project = new Project(req.body);
+//     project.save((err, project) => {
+//         if (err) return res.json({success: false, err});
+//         return res.status(200).json({success: true});
+//     })
+// })
 
 // 알림 생성, 알림 불러오기, 팀원 초대, 프로젝트 나가기, 진행률, 참여율
 
 // 프로젝트 이름 변경
-router.put('/api/project/:projectId/settings/modifyname', (req, res) => {
-    Project.findByIdAndUpdate({_id: req.params.projectId}, req.body).then(function(){
-        Project.findOne({_id: req.params.proejctId}, (err, project) => {
+router.put('/api/project/:id/settings/modifyname', (req, res) => {
+    const project = new Project();
+    Project.findByIdAndUpdate({_id: req.params.id}, req.body).then(function(){
+        Project.findOne({_id: req.params.id}, (err, project) => {
             if (err) return res.json({success: false, err});
             return res.status(200).json({success: true, projectname: project.projectname});
         })
@@ -133,12 +147,13 @@ router.put('/api/project/:projectId/settings/modifyname', (req, res) => {
 })
 
 // 프로젝트 나가기
-router.put('/api/project/:projectId/settings/leaveproject'), (req, res) => {
-    Project.findByIdAndUpdate({_id: req.params.projectId}, {$pull: {contributor: req.body}}, (err, project) => {
+router.put('/api/project/:id/settings/leaveproject', (req, res) => {
+    const project = new Project();
+    Project.findByIdAndUpdate({_id: req.params.id}, {$pull: {contributor: req.body}}, (err, project) => {
         if (err) return res.json({success: false, err});
         return res.status(200).json({success: true});
     })
-}
+})
 
 // 알림 생성
 
