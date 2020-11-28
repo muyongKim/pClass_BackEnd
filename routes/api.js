@@ -1,9 +1,6 @@
 const express = require('express');
 const { User } = require("../schema/User");
-const { Project } = require("../schema/Project");
-const { Subject } = require("../schema/Subject");
-const { Feed } = require("../schema/Feed");
-const { Comment } = require("../schema/Comment");
+const { Subject, Project, Feed, Comment } = require("../schema/Subject");
 
 const router = express.Router();
 
@@ -73,8 +70,6 @@ router.post('/api/project/register', (req, res) => {
         projectreadme: req.body.projectreadme,
         leader: req.body.name
     });
-    
-    project.save();
     User.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: project}}).then(function() {
         Subject.findOneAndUpdate({sub_id: req.body.subId}, {$push: {project: project}}, (err, user) => {
             if (err) return res.status(400).send(err);
@@ -92,25 +87,31 @@ router.post('/api/project/register', (req, res) => {
 //     });
 // });
   
-// 프로젝트 삭제
-router.put("/api/project/delete/:projectId", async (req, res) => {
-    try {
-        const removeProject = await Subject.deleteOne({ _id: req.params.projectId });
-        res.json(removeProject);
-    } catch (err) {
-        res.status(400).send(err);
-    }
+// // 프로젝트 삭제
+// router.put("/api/project/delete/:projectId", async (req, res) => {
+//     try {
+//         const removeProject = await Subject.deleteOne({ _id: req.params.projectId });
+//         res.json(removeProject);
+//     } catch (err) {
+//         res.status(400).send(err);
+//     }
+// });
+
+router.put('/api/:subId/project/:projectId/delete', (req, res) => {
+    Subject.findOneAndUpdate({sub_id: req.params.subId}, {$pull: {project: {_id: req.params.projectId}}}, {new: true}, (err, project) => {
+        if (err) return res.status(400).json({success: false, err});
+        return res.status(200).json({success: true});
+    })
+})
+
+//subject DB에 데이터 삽입
+router.post('/api/subject/test', (req, res) => {
+    const subject = new Subject(req.body);
+    subject.save((err, subject) => {
+        if (err) return res.json({success: false, err});
+        return res.status(200).json({success: true});
+    })
 });
-
-
-// //subject DB에 데이터 삽입
-// router.post('/api/subject/test', (req, res) => {
-//     const subject = new Subject(req.body);`
-//     subject.save((err, subject) => {
-//         if (err) return res.json({success: false, err});
-//         return res.status(200).json({success: true});
-//     })
-// })
 
 // // project DB에 데이터 삽입
 // router.post('/api/project/test', (req, res) => {
