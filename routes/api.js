@@ -65,7 +65,7 @@ router.get('/api/subjectmenu/:subjectId', (req, res) => {
 })
 
 // 프로젝트 개설
-router.post("/api/project/register", (req, res) => {
+router.post('/api/project/register', (req, res) => {
     const project = new Project({ 
         projectname: req.body.projectname,
         projectreadme: req.body.projectreadme,
@@ -74,7 +74,7 @@ router.post("/api/project/register", (req, res) => {
     
     project.save();
     User.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: project}}).then(function() {
-        Subject.findByIdAndUpdate({_id: req.body.subId}, {$push: {project: project}}, (err, user) => {
+        Subject.findOneAndUpdate({sub_id: req.body.subId}, {$push: {project: project}}, (err, user) => {
             if (err) return res.status(400).send(err);
             return res.status(200).json({success: true});
         })
@@ -100,12 +100,9 @@ router.post("/api/project/register", (req, res) => {
 //     }
 // });
 
-router.delete("/api/project/delete/:projectId", (req, res) => {
-    Subject.deleteOne({_id: req.params.projectId}, (err, project) => {
-        if (err) return res.status(400).send(err);
-        return res.status(204).json({Success: true});
-    })
-})
+// router.put('/api/project/delete/:subjectId', (req, res) => {
+//     Subject.findByIdAndUpdate({_id: req.params.projectId}, {$pull: {project: }})
+// })
 
 // //subject DB에 데이터 삽입
 // router.post('/api/subject/test', (req, res) => {
