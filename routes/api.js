@@ -50,7 +50,6 @@ router.get('/api/users/all', function(req, res) {
 
 // 전체 과목 Get
 router.get('/api/subjectmenu', function(req, res) {
-    const subject = new Subject();
     Subject.find({}, {_id: false, subjectname: true, sub_id: true}, function(err, subject) {
         if (err) return res.status(400).send(err);
         return res.status(200).json(subject);
@@ -64,56 +63,49 @@ router.get('/api/subjectmenu/:subjectId', (req, res) => {
         return res.status(200).json(subject);
     })
 })
-  
-//프로젝트 개설
-// router.post("/api/project/register", async (req, res) => {
-//     const project = new Project({
-//       projectname: req.body.projectname,
-//       projectreadme: req.body.projectreadme
-//     });
-//     try {
-//       const saveProject = await project.save();
-//       res.json(saveProject);
-//     } catch (err) {
-//       res.status(400).send(err);
-//     }
-//   });
 
 // 프로젝트 개설
 router.post("/api/project/register", (req, res) => {
-    const project = new Subject({
+    const project = new Project({ 
         projectname: req.body.projectname,
         projectreadme: req.body.projectreadme,
         leader: req.body.name
     });
     
     project.save();
-    Subject.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: project}}).then(function() {
-        Subject.findByIdAndUpdate({_id: req.body.subId}, {$push: {p_list: project}}, (err, user) => {
+    User.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: project}}).then(function() {
+        Subject.findByIdAndUpdate({_id: req.body.subId}, {$push: {project: project}}, (err, user) => {
             if (err) return res.status(400).send(err);
             return res.status(200).json({success: true});
         })
     })
 })
   
-  //프로젝트 조회
-  router.get("/api/project", function(req, res) {
-    const project = new Project();
-    Project.find(function(err, project) {
-      if (err) return res.status(400).send(err)
-      return res.json(project);
-    });
-  });
+// //프로젝트 조회
+// router.get("/api/project", function(req, res) {
+//     const project = new Project();
+//     Project.find(function(err, project) {
+//         if (err) return res.status(400).send(err)
+//         return res.json(project);
+//     });
+// });
   
-  //프로젝트 삭제
-  router.delete("/api/project/:projectId", async (req, res) => {
-    try {
-      const removeProject = await Project.remove({ _id: req.params.projectId });
-      res.json(removeProject);
-    } catch (err) {
-      res.status(400).send(err);
-    }
-  });
+//프로젝트 삭제
+// router.delete("/api/project/delete/:projectId", async (req, res) => {
+//     try {
+//         const removeProject = await Project.remove({ _id: req.params.projectId });
+//         res.json(removeProject);
+//     } catch (err) {
+//         res.status(400).send(err);
+//     }
+// });
+
+router.delete("/api/project/delete/:projectId", (req, res) => {
+    Subject.deleteOne({_id: req.params.projectId}, (err, project) => {
+        if (err) return res.status(400).send(err);
+        return res.status(204).json({Success: true});
+    })
+})
 
 // //subject DB에 데이터 삽입
 // router.post('/api/subject/test', (req, res) => {

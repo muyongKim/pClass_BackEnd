@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
     name: String,
     token: String,
     p_list: Array,
-    sub_list: Array,
+    //sub_list: Array,
     
     email: {
         type: String,
