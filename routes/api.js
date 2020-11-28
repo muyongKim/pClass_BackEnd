@@ -81,15 +81,15 @@ router.get('/api/subjectmenu/:subjectId', (req, res) => {
 
 // 프로젝트 개설
 router.post("/api/project/register", (req, res) => {
-    const project = new Project({
+    const project = new Subject({
         projectname: req.body.projectname,
         projectreadme: req.body.projectreadme,
         leader: req.body.name
     });
     
     project.save();
-    User.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: req.body.projectname}}).then(function() {
-        Subject.findByIdAndUpdate({_id: req.body.subId}, {$push: {p_list: req.body.projectname}}, (err, subject) => {
+    Subject.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: project}}).then(function() {
+        Subject.findByIdAndUpdate({_id: req.body.subId}, {$push: {p_list: project}}, (err, user) => {
             if (err) return res.status(400).send(err);
             return res.status(200).json({success: true});
         })
