@@ -2,6 +2,8 @@ const express = require('express');
 const { User } = require("../schema/User");
 const { Project } = require("../schema/Project");
 const { Subject } = require("../schema/Subject");
+const { Feed } = require("../schema/Feed");
+const { Comment } = require("../schema/Comment");
 
 const router = express.Router();
 
@@ -90,23 +92,20 @@ router.post('/api/project/register', (req, res) => {
 //     });
 // });
   
-//프로젝트 삭제
-// router.delete("/api/project/delete/:projectId", async (req, res) => {
-//     try {
-//         const removeProject = await Project.remove({ _id: req.params.projectId });
-//         res.json(removeProject);
-//     } catch (err) {
-//         res.status(400).send(err);
-//     }
-// });
+// 프로젝트 삭제
+router.put("/api/project/delete/:projectId", async (req, res) => {
+    try {
+        const removeProject = await Subject.deleteOne({ _id: req.params.projectId });
+        res.json(removeProject);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
 
-// router.put('/api/project/delete/:subjectId', (req, res) => {
-//     Subject.findByIdAndUpdate({_id: req.params.projectId}, {$pull: {project: }})
-// })
 
 // //subject DB에 데이터 삽입
 // router.post('/api/subject/test', (req, res) => {
-//     const subject = new Subject(req.body);
+//     const subject = new Subject(req.body);`
 //     subject.save((err, subject) => {
 //         if (err) return res.json({success: false, err});
 //         return res.status(200).json({success: true});

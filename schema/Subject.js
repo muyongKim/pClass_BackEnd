@@ -12,11 +12,7 @@ const subjectSchema = mongoose.Schema({
         type: String,
         trim: true,
         unique: 1
-    },
-
-    project: [
-        
-    ]
+    }
 })
 
 const Subject = mongoose.model('Subject', subjectSchema);
