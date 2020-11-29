@@ -91,11 +91,11 @@ router.post('/api/:subId/project/register', (req, res) => {
 // })
 
 // 프로젝트 삭제
-router.put('/api/:subId/project/delete', (req, res) => {
-    Project.findByIdAndDelete({_id: req.body.projectId}).then(function() {
-        User.findOneAndUpdate({_id: req.body.userId}, { $pull: { p_list: { _id: req.body.projectId}}}, {safe:true, upsert: true}, (err, data) => {
+router.put('/api/:subId/:projectId/delete', (req, res) => {
+    Project.findByIdAndDelete({_id: req.params.projectId}).then(function() {
+        User.findOneAndUpdate({_id: req.body.userId}, { $pull: { p_list: {projectname: req.body.projectname}}}, {safe:true, upsert: true}, (err, data) => {
             if (err) return res.status(400).send(err);
-            return res.status(200).json(data);
+            return res.status(200).end();
         })
     })
 })
