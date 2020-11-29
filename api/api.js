@@ -119,8 +119,8 @@ router.post('/api/project/main', (req, res) => {
 //     })
 // })
 
-// 피드 추가
-router.post('/api/subject/:subId/:projectId', (req, res) => {
+// 피드 추가 ToDo
+router.post('/api/:subId/:projectId/addToDo', (req, res) => {
     const feed = new Feed({
         sub_id: req.params.subId,
         project_id: req.params.projectId,
@@ -138,7 +138,7 @@ router.post('/api/subject/:subId/:projectId', (req, res) => {
 })
 
 //DOING
-router.post('/api/subject/:subId/:projectId/DOING', (req, res) => {
+router.post('/api/:subId/:projectId/addDOING', (req, res) => {
     const feed = new Feed({
         sub_id: req.params.subId,
         project_id: req.params.projectId,
@@ -157,7 +157,7 @@ router.post('/api/subject/:subId/:projectId/DOING', (req, res) => {
 })
 
 //DONE
-router.post('/api/subject/:subId/:projectId/DONE', (req, res) => {
+router.post('/api/:subId/:projectId/addDONE', (req, res) => {
     const feed = new Feed({
         sub_id: req.params.subId,
         project_id: req.params.projectId,
@@ -192,47 +192,28 @@ router.delete('/api/:subId/:projectId/:feedId/deletefeed', (req, res) => {
 })
 
 //프로젝트 내 TODO피드 조회
-router.post("/api/subject/feed/TODO", (req, res) => {
-    Feed.find(
-      {
-        project_id: req.body.projectId,
-        status: 0
-      },
-      (err, data) => {
+router.post("/api/:subId/:projectId/ToDo", (req, res) => {
+    Feed.find({$and: [{project_id: req.params.projectId},{status: 0}]}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(200).json(data);
-      }
-    );
-  });
+      });
+});
   
-
 //프로젝트 내 Doing피드 조회
-router.post("/api/subject/feed/Doing", (req, res) => {
-    Feed.find(
-      {
-        project_id: req.body.projectId,
-        status: 1
-      },
-      (err, data) => {
+router.post("/api/:subId/:projectId/Doing", (req, res) => {
+    Feed.find({$and: [{project_id: req.params.projectId},{status: 1}]}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(200).json(data);
-      }
-    );
-  });
+      });
+});
   
   //프로젝트 내 Done피드 조회
-  router.post("/api/subject/feed/Done", (req, res) => {
-    Feed.find(
-      {
-        project_id: req.body.projectId,
-        status: 2
-      },
-      (err, data) => {
+  router.post("/api/:subId/:projectId/Done", (req, res) => {
+    Feed.find({$and: [{project_id: req.params.projectId},{status: 2}]}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(200).json(data);
-      }
-    );
-  });
+      });
+});
 
 // 알림 생성, 알림 불러오기, 팀원 초대, 진행률, 참여율
 
