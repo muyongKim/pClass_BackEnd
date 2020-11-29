@@ -41,7 +41,7 @@ server.use(bodyParser.urlencoded({ extended: true}));
 // }));
 
 // IMPORT ROUTES
-const route = require('./routes/api');
+const route = require('./api/api');
 server.use('/', route);
 
 // RUN SERVER

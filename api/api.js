@@ -92,7 +92,7 @@ router.put('/api/:projectId/delete', (req, res) => {
 })
 
 // 프로젝트 정보 조회
-router.get('/api/project/showinfo', (req, res) => {
+router.post('/api/project/main', (req, res) => {
     Project.findById({_id: req.body.projectId}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(200).json(data);
