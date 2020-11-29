@@ -124,11 +124,11 @@ router.post('/api/:subId/:projectId/addToDo', (req, res) => {
     const feed = new Feed({
         sub_id: req.params.subId,
         project_id: req.params.projectId,
-        writer: req.body.useremail,
+        writer: req.body.writer,
         feedname: req.body.feedname,
         manager: req.body.manager,
-        start_date: req.body.start,
-        end_date: req.body.end,
+        start_date: req.body.start_date,
+        end_date: req.body.end_date,
         content: req.body.content,
         status: req.body.status
     });
