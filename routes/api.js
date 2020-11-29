@@ -1,6 +1,9 @@
 const express = require('express');
 const { User } = require("../schema/User");
-const { Subject, Project, Feed, Comment } = require("../schema/Subject");
+const { Subject} = require("../schema/Subject");
+const { Project } = require("../schema/Project");
+const { Feed } = require("../schema/Feed");
+const { Comment } = require("../schema/Comment");
 
 const router = express.Router();
 
@@ -57,24 +60,24 @@ router.get('/api/subjectmenu', function(req, res) {
 
 // 과목의 개설된 프로젝트 표시
 router.get('/api/subjectmenu/:subjectId', (req, res) => {
-    Subject.findOne({sub_id: req.params.subjectId}, function(err, subject) {
+    Project.find({sub_id: req.params.subjectId}, function(err, data) {
         if (err) return res.status(400).send(err);
-        return res.status(200).json(subject);
+        return res.status(200).json(data);
     })
 })
 
 // 프로젝트 개설
-router.post('/api/project/register', (req, res) => {
+router.post('/api/:subId/project/register', (req, res) => {
     const project = new Project({ 
         projectname: req.body.projectname,
         projectreadme: req.body.projectreadme,
-        leader: req.body.name
+        leader: req.body.name,
+        sub_id: req.params.subId
     });
-    User.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: project}}).then(function() {
-        Subject.findOneAndUpdate({sub_id: req.body.subId}, {$push: {project: project}}, (err, user) => {
-            if (err) return res.status(400).send(err);
-            return res.status(200).json({success: true});
-        })
+    project.save();
+    User.findByIdAndUpdate({_id: req.body.userId}, {$push: {p_list: project}}, (err, data) => {
+        if (err) return res.status(400).send(err);
+        return res.status(200).json({success: true});
     })
 })
   
@@ -84,23 +87,16 @@ router.post('/api/project/register', (req, res) => {
 //     Project.find(function(err, project) {
 //         if (err) return res.status(400).send(err)
 //         return res.json(project);
-//     });
-// });
-  
-// // 프로젝트 삭제
-// router.put("/api/project/delete/:projectId", async (req, res) => {
-//     try {
-//         const removeProject = await Subject.deleteOne({ _id: req.params.projectId });
-//         res.json(removeProject);
-//     } catch (err) {
-//         res.status(400).send(err);
-//     }
-// });
+//     })
+// })
 
-router.put('/api/:subId/project/:projectId/delete', (req, res) => {
-    Subject.findOneAndUpdate({sub_id: req.params.subId}, {$pull: {project: {_id: req.params.projectId}}}, {new: true}, (err, project) => {
-        if (err) return res.status(400).json({success: false, err});
-        return res.status(200).json({success: true});
+// 프로젝트 삭제
+router.put('/api/:subId/project/delete', (req, res) => {
+    Project.findByIdAndDelete({_id: req.body.projectId}).then(function() {
+        User.findOneAndUpdate({_id: req.body.userId}, { $pull: { p_list: { _id: req.body.projectId}}}, {safe:true, upsert: true}, (err, data) => {
+            if (err) return res.status(400).send(err);
+            return res.status(200).json(data);
+        })
     })
 })
 
@@ -111,7 +107,7 @@ router.post('/api/subject/test', (req, res) => {
         if (err) return res.json({success: false, err});
         return res.status(200).json({success: true});
     })
-});
+})
 
 // // project DB에 데이터 삽입
 // router.post('/api/project/test', (req, res) => {
