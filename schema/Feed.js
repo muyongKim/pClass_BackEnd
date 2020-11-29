@@ -5,7 +5,7 @@ const feedSchema = mongoose.Schema({
     project_id: String,
     writer: String,
     feedname: String,
-    manager: Array, 
+    manager: String, 
     start_date: Number,
     end_date: Number,
     status: {type: Number, default: 0},     // ToDo : 0, Doing : 1, Done : 2
