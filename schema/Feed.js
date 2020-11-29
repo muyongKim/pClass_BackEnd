@@ -8,7 +8,7 @@ const feedSchema = mongoose.Schema({
     manager: String, 
     start_date: Number,
     end_date: Number,
-    status: {type: Number, default: 0},     // ToDo : 0, Doing : 1, Done : 2
+    status: Number,     // ToDo : 0, Doing : 1, Done : 2
     content: {type: String, default: null}
 })
 

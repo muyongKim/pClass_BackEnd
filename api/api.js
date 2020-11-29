@@ -129,7 +129,8 @@ router.post('/api/:subId/:projectId/addToDo', (req, res) => {
         manager: req.body.manager,
         start_date: req.body.start,
         end_date: req.body.end,
-        content: req.body.content
+        content: req.body.content,
+        status: req.body.status
     });
     feed.save((err, data) => {
         if (err) return res.json({success: false, err});
@@ -137,43 +138,43 @@ router.post('/api/:subId/:projectId/addToDo', (req, res) => {
     });
 })
 
-//DOING
-router.post('/api/:subId/:projectId/addDOING', (req, res) => {
-    const feed = new Feed({
-        sub_id: req.params.subId,
-        project_id: req.params.projectId,
-        writer: req.body.username,
-        feedname: req.body.feedname,
-        manager: req.body.manager,
-        start_date: req.body.start,
-        end_date: req.body.end,
-        content: req.body.content,
-        status:1    
-    });
-    feed.save((err, data) => {
-        if (err) return res.json({success: false, err});
-        return res.status(200).json({success: true});
-    });
-})
+// //DOING
+// router.post('/api/:subId/:projectId/addDOING', (req, res) => {
+//     const feed = new Feed({
+//         sub_id: req.params.subId,
+//         project_id: req.params.projectId,
+//         writer: req.body.username,
+//         feedname: req.body.feedname,
+//         manager: req.body.manager,
+//         start_date: req.body.start,
+//         end_date: req.body.end,
+//         content: req.body.content,
+//         status:1    
+//     });
+//     feed.save((err, data) => {
+//         if (err) return res.json({success: false, err});
+//         return res.status(200).json({success: true});
+//     });
+// })
 
-//DONE
-router.post('/api/:subId/:projectId/addDONE', (req, res) => {
-    const feed = new Feed({
-        sub_id: req.params.subId,
-        project_id: req.params.projectId,
-        writer: req.body.username,
-        feedname: req.body.feedname,
-        manager: req.body.manager,
-        start_date: req.body.start,
-        end_date: req.body.end,
-        content: req.body.content,
-        status:2    
-    });
-    feed.save((err, data) => {
-        if (err) return res.json({success: false, err});
-        return res.status(200).json({success: true});
-    });
-})
+// //DONE
+// router.post('/api/:subId/:projectId/addDONE', (req, res) => {
+//     const feed = new Feed({
+//         sub_id: req.params.subId,
+//         project_id: req.params.projectId,
+//         writer: req.body.username,
+//         feedname: req.body.feedname,
+//         manager: req.body.manager,
+//         start_date: req.body.start,
+//         end_date: req.body.end,
+//         content: req.body.content,
+//         status:2    
+//     });
+//     feed.save((err, data) => {
+//         if (err) return res.json({success: false, err});
+//         return res.status(200).json({success: true});
+//     });
+// })
 
 // 피드 수정
 router.put('/api/:subId/:projectId/:feedId/modifyfeed', (req, res) => {
