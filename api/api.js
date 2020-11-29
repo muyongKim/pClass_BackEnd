@@ -1,4 +1,5 @@
 const express = require('express');
+const nodemailer = require('nodemailer');
 const { User } = require("../schema/User");
 const { Subject} = require("../schema/Subject");
 const { Project } = require("../schema/Project");
@@ -138,44 +139,6 @@ router.post('/api/:subId/:projectId/addToDo', (req, res) => {
     });
 })
 
-// //DOING
-// router.post('/api/:subId/:projectId/addDOING', (req, res) => {
-//     const feed = new Feed({
-//         sub_id: req.params.subId,
-//         project_id: req.params.projectId,
-//         writer: req.body.username,
-//         feedname: req.body.feedname,
-//         manager: req.body.manager,
-//         start_date: req.body.start,
-//         end_date: req.body.end,
-//         content: req.body.content,
-//         status:1    
-//     });
-//     feed.save((err, data) => {
-//         if (err) return res.json({success: false, err});
-//         return res.status(200).json({success: true});
-//     });
-// })
-
-// //DONE
-// router.post('/api/:subId/:projectId/addDONE', (req, res) => {
-//     const feed = new Feed({
-//         sub_id: req.params.subId,
-//         project_id: req.params.projectId,
-//         writer: req.body.username,
-//         feedname: req.body.feedname,
-//         manager: req.body.manager,
-//         start_date: req.body.start,
-//         end_date: req.body.end,
-//         content: req.body.content,
-//         status:2    
-//     });
-//     feed.save((err, data) => {
-//         if (err) return res.json({success: false, err});
-//         return res.status(200).json({success: true});
-//     });
-// })
-
 // 피드 수정
 router.put('/api/:subId/:projectId/:feedId/modifyfeed', (req, res) => {
     Feed.findByIdAndUpdate({_id: req.params.feedId}, req.body, (err, data) => {
@@ -215,6 +178,14 @@ router.post("/api/:subId/:projectId/Doing", (req, res) => {
         return res.status(200).json(data);
       });
 });
+
+// 피드 DRAG & DROP 상태 변경
+router.put('/api/:subId/:projectId/feedDragDrop', (req, res) => {
+    Feed.findByIdAndUpdate({_id: req.body.feedId}, {status: req.body.status}, (err, data) => {
+        if (err) return res.status(400).send(err);
+        return res.status(200).json({success: true});
+    })
+})
 
 // 프로젝트 이름 수정
 router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
