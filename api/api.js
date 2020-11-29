@@ -120,7 +120,9 @@ router.post('/api/project/main', (req, res) => {
 // })
 
 // 피드 추가
-router.post('/api/subject/:subId/:projectId', (req, res) => {
+
+//TO DO
+router.post('/api/subject/:subId/:projectId/TODO', (req, res) => {
     const feed = new Feed({
         sub_id: req.params.subId,
         project_id: req.params.projectId,
@@ -129,7 +131,46 @@ router.post('/api/subject/:subId/:projectId', (req, res) => {
         manager: req.body.manager,
         start_date: req.body.start,
         end_date: req.body.end,
-        content: req.body.content
+        content: req.body.content,
+        status:0    
+    });
+    feed.save((err, data) => {
+        if (err) return res.json({success: false, err});
+        return res.status(200).json({success: true});
+    });
+})
+
+//DOING
+router.post('/api/subject/:subId/:projectId/DOING', (req, res) => {
+    const feed = new Feed({
+        sub_id: req.params.subId,
+        project_id: req.params.projectId,
+        writer: req.body.username,
+        feedname: req.body.feedname,
+        manager: req.body.manager,
+        start_date: req.body.start,
+        end_date: req.body.end,
+        content: req.body.content,
+        status:1    
+    });
+    feed.save((err, data) => {
+        if (err) return res.json({success: false, err});
+        return res.status(200).json({success: true});
+    });
+})
+
+//DONE
+router.post('/api/subject/:subId/:projectId/DONE', (req, res) => {
+    const feed = new Feed({
+        sub_id: req.params.subId,
+        project_id: req.params.projectId,
+        writer: req.body.username,
+        feedname: req.body.feedname,
+        manager: req.body.manager,
+        start_date: req.body.start,
+        end_date: req.body.end,
+        content: req.body.content,
+        status:2    
     });
     feed.save((err, data) => {
         if (err) return res.json({success: false, err});
@@ -177,6 +218,47 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
     })
 })
 
+//코멘트 생성
+router.post('/api/subject/:subId/:projectId/:feedId', (req, res) => {
+    const comment = new Comment({
+        sub_id: req.params.subId,
+        project_id: req.params.projectId,
+        feed_id: req.params.feedId,
+        username: req.body.username,
+        content: req.body.content,
+        time: 123123123123
+    });
+
+    comment.save((err, data) => {
+        if (err) return res.json({success: false, err})
+        return res.status(200).json({success: true})
+    });
+
+})
+
+//코멘트 삭제
+router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, res) => {
+    Comment.findByIdAndDelete({_id: req.params.commentId}, (err, data) => {
+        return res.status(200).end();
+    })
+}
+
+// //채팅 생성
+// router.post('/api/subject/:subId/:projectId/registerchatting'), (req, res) => {
+//      Project.findByIdAndUpdate({_id: req.params.projectId}, {$set:{username: req.username, content: req.content, time: req.time}}, (err, data)=>{
+//         if (err) return res.json({success: false, err});
+//         return res.status(200).json({success: true});
+//      })
+    
+// }
+
+// //채팅 불러오기
+// router.get('/api/subject/:subId/:projectId/showchatting'), (req, res) => {
+//     Project.findById({_id: req.body.projectId}, (err, data) => {
+//         if (err) return res.status(400).send(err);
+//         return res.status(200).json(data);
+//     })
+// }
 // 알림 생성
 
 
