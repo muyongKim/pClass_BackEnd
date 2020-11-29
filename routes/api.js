@@ -91,7 +91,7 @@ router.post('/api/:subId/project/register', (req, res) => {
 // })
 
 // 프로젝트 삭제
-router.put('/api/:subId/:projectId/delete', (req, res) => {
+router.put('/api/:projectId/delete', (req, res) => {
     Project.findByIdAndDelete({_id: req.params.projectId}).then(function() {
         User.findOneAndUpdate({_id: req.body.userId}, { $pull: { p_list: {projectname: req.body.projectname}}}, {safe:true, upsert: true}, (err, data) => {
             if (err) return res.status(400).send(err);
@@ -121,15 +121,15 @@ router.post('/api/subject/test', (req, res) => {
 // 알림 생성, 알림 불러오기, 팀원 초대, 프로젝트 나가기, 진행률, 참여율
 
 // 프로젝트 이름 변경
-router.put('/api/project/:id/settings/modifyname', (req, res) => {
-    const project = new Project();
-    Project.findByIdAndUpdate({_id: req.params.id}, req.body).then(function(){
-        Project.findOne({_id: req.params.id}, (err, project) => {
-            if (err) return res.json({success: false, err});
-            return res.status(200).json({success: true, projectname: project.projectname});
-        })
-    })
-})
+// router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
+//     const project = new Project();
+//     Project.findByIdAndUpdate({_id: req.params.projectId}, req.body).then(function(){
+//         Project.findOne({_id: req.params.projectId}, (err, project) => {
+//             if (err) return res.json({success: false, err});
+//             return res.status(200).json({success: true});
+//         })
+//     })
+// })
 
 // 프로젝트 나가기
 router.put('/api/project/:id/settings/leaveproject', (req, res) => {
