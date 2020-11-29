@@ -124,7 +124,7 @@ router.post('/api/:subId/:projectId/addToDo', (req, res) => {
     const feed = new Feed({
         sub_id: req.params.subId,
         project_id: req.params.projectId,
-        writer: req.body.username,
+        writer: req.body.useremail,
         feedname: req.body.feedname,
         manager: req.body.manager,
         start_date: req.body.start,
@@ -216,8 +216,6 @@ router.post("/api/:subId/:projectId/Doing", (req, res) => {
       });
 });
 
-// 알림 생성, 알림 불러오기, 팀원 초대, 진행률, 참여율
-
 // 프로젝트 이름 수정
 router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
     Project.findByIdAndUpdate({_id: req.params.projectId}, {projectname: req.body.modifyname}).then(function(){
@@ -240,7 +238,9 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
     })
 })
 
-// 알림 생성
+// 알림 생성, 알림 불러오기, 팀원 초대, 진행률, 참여율
+
+
 
 //코멘트 생성
 router.post('/api/subject/:subId/:projectId/:feedId', (req, res) => {
