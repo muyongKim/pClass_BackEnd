@@ -191,6 +191,21 @@ router.delete('/api/:subId/:projectId/:feedId/deletefeed', (req, res) => {
     })
 })
 
+//프로젝트 내 TODO피드 조회
+router.post("/api/subject/feed/TODO", (req, res) => {
+    Feed.find(
+      {
+        project_id: req.body.projectId,
+        status: 0
+      },
+      (err, data) => {
+        if (err) return res.status(400).send(err);
+        return res.status(200).json(data);
+      }
+    );
+  });
+  
+
 //프로젝트 내 Doing피드 조회
 router.post("/api/subject/feed/Doing", (req, res) => {
     Feed.find(
