@@ -194,7 +194,7 @@ router.delete('/api/:subId/:projectId/:feedId/deletefeed', (req, res) => {
 
 //프로젝트 내 TODO피드 조회
 router.post("/api/:subId/:projectId/ToDo", (req, res) => {
-    Feed.find({$and: [{project_id: req.params.projectId},{status: 0}]}, (err, data) => {
+    Feed.find({$and: [{project_id: req.params.projectId},{status: 'column0'}]}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(200).json(data);
       });
@@ -202,7 +202,7 @@ router.post("/api/:subId/:projectId/ToDo", (req, res) => {
   
 //프로젝트 내 Doing피드 조회
 router.post("/api/:subId/:projectId/Doing", (req, res) => {
-    Feed.find({$and: [{project_id: req.params.projectId},{status: 1}]}, (err, data) => {
+    Feed.find({$and: [{project_id: req.params.projectId},{status: 'column1'}]}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(200).json(data);
       });
@@ -210,7 +210,7 @@ router.post("/api/:subId/:projectId/Doing", (req, res) => {
   
   //프로젝트 내 Done피드 조회
   router.post("/api/:subId/:projectId/Done", (req, res) => {
-    Feed.find({$and: [{project_id: req.params.projectId},{status: 2}]}, (err, data) => {
+    Feed.find({$and: [{project_id: req.params.projectId},{status: 'column2'}]}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(200).json(data);
       });
@@ -250,7 +250,7 @@ router.post('/api/subject/:subId/:projectId/:feedId', (req, res) => {
         feed_id: req.params.feedId,
         username: req.body.username,
         content: req.body.content,
-        time: 123123123123
+        time: req.body.time
     });
 
     comment.save((err, data) => {
