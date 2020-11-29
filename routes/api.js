@@ -80,34 +80,25 @@ router.post('/api/:subId/project/register', (req, res) => {
         return res.status(200).json({success: true});
     })
 })
-  
-// //프로젝트 조회
-// router.get("/api/project", function(req, res) {
-//     const project = new Project();
-//     Project.find(function(err, project) {
-//         if (err) return res.status(400).send(err)
-//         return res.json(project);
-//     })
-// })
 
 // 프로젝트 삭제
 router.put('/api/:projectId/delete', (req, res) => {
     Project.findByIdAndDelete({_id: req.params.projectId}).then(function() {
         User.findOneAndUpdate({_id: req.body.userId}, { $pull: { p_list: {projectname: req.body.projectname}}}, {safe:true, upsert: true}, (err, data) => {
             if (err) return res.status(400).send(err);
-            return res.status(200).end();
+            return res.status(204).end();
         })
     })
 })
 
-//subject DB에 데이터 삽입
-router.post('/api/subject/test', (req, res) => {
-    const subject = new Subject(req.body);
-    subject.save((err, subject) => {
-        if (err) return res.json({success: false, err});
-        return res.status(200).json({success: true});
-    })
-})
+// //subject DB에 데이터 삽입
+// router.post('/api/subject/test', (req, res) => {
+//     const subject = new Subject(req.body);
+//     subject.save((err, subject) => {
+//         if (err) return res.json({success: false, err});
+//         return res.status(200).json({success: true});
+//     })
+// })
 
 // // project DB에 데이터 삽입
 // router.post('/api/project/test', (req, res) => {
@@ -118,18 +109,51 @@ router.post('/api/subject/test', (req, res) => {
 //     })
 // })
 
+// 피드 추가
+router.post('/api/subject/:subId/:projectId', (req, res) => {
+    const feed = new Feed({
+        sub_id: req.params.subId,
+        project_id: req.params.projectId,
+        writer: req.body.username,
+        feedname: req.body.feedname,
+        manager: req.body.manager,
+        start_date: req.body.start,
+        end_date: req.body.end,
+        content: req.body.content
+    });
+    feed.save((err, data) => {
+        if (err) return res.json({success: false, err});
+        return res.status(200).json({success: true});
+    });
+})
+
+// 피드 수정
+router.put('/api/subject/:subId/:projectId/:feedId/modifyfeed', (req, res) => {
+    Feed.findByIdAndUpdate({_id: req.params.feedId}, req.body, (err, data) => {
+        if (err) return res.json({success: false, err});
+        return res.status(200).json({success: true});
+    })
+})
+
+// 피드 삭제
+router.delete('/api/subject/:subId/:projectId/:feedId/deletefeed', (req, res) => {
+    Feed.findByIdAndDelete({_id: req.params.feedId}, (err, data) => {
+        if (err) return res.status(400).send(err);
+        return res.status(204).end();
+    })
+})
+
 // 알림 생성, 알림 불러오기, 팀원 초대, 프로젝트 나가기, 진행률, 참여율
 
 // 프로젝트 이름 변경
-// router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
-//     const project = new Project();
-//     Project.findByIdAndUpdate({_id: req.params.projectId}, req.body).then(function(){
-//         Project.findOne({_id: req.params.projectId}, (err, project) => {
-//             if (err) return res.json({success: false, err});
-//             return res.status(200).json({success: true});
-//         })
-//     })
-// })
+router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
+    Project.findByIdAndUpdate({_id: req.params.projectId}, req.body).then(function(){
+        Project.findOne({_id: req.params.projectId}, (err, project) => {
+            if (err) return res.json({success: false, err});
+            return res.status(200).json({success: true});
+        })
+    })
+})
 
 // 프로젝트 나가기
 router.put('/api/project/:id/settings/leaveproject', (req, res) => {
