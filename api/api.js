@@ -242,5 +242,48 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
 
 // 알림 생성
 
+//코멘트 생성
+router.post('/api/subject/:subId/:projectId/:feedId', (req, res) => {
+    const comment = new Comment({
+        sub_id: req.params.subId,
+        project_id: req.params.projectId,
+        feed_id: req.params.feedId,
+        username: req.body.username,
+        content: req.body.content,
+        time: 123123123123
+    });
+
+    comment.save((err, data) => {
+        if (err) return res.json({success: false, err})
+        return res.status(200).json({success: true})
+    });
+
+})
+
+//코멘트 삭제
+router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, res) => {
+    Comment.findByIdAndDelete({_id: req.params.commentId}, (err, data) => {
+        return res.status(200).end();
+    })
+}
+
+// //채팅 생성
+// router.post('/api/subject/:subId/:projectId/registerchatting'), (req, res) => {
+//      Project.findByIdAndUpdate({_id: req.params.projectId}, {$set:{username: req.username, content: req.content, time: req.time}}, (err, data)=>{
+//         if (err) return res.json({success: false, err});
+//         return res.status(200).json({success: true});
+//      })
+    
+// }
+
+// //채팅 불러오기 하다맘
+// router.get('/api/subject/:subId/:projectId/showchatting'), (req, res) => {
+//     Project.findById({_id: req.body.projectId}, (err, data) => {
+//         if (err) return res.status(400).send(err);
+//         return res.status(200).json(data);
+//     })
+// }
+
+
 
 module.exports = router;
