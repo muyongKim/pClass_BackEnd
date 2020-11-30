@@ -231,7 +231,7 @@ router.post('/api/subject/:subId/:projectId/:feedId/addcomment', (req, res) => {
 })
 
 //코멘트 삭제
-router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, res) => {
+router.delete('/api/:subId/:projectId/:feedId/:commentId/deletecomment'), (req, res) => {
     Comment.findByIdAndDelete({_id: req.params.commentId}, (err, data) => {
         if (err) return res.status(400).send(err);
         return res.status(204).end();
