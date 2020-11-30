@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const ejs = require('ejs');
+const path = require('path');
 const { User } = require("../schema/User");
 const { Subject} = require("../schema/Subject");
 const { Project } = require("../schema/Project");
@@ -210,10 +212,8 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
     })
 })
 
-// 알림 생성, 알림 불러오기, 팀원 초대, 진행률, 참여율
-
 //코멘트 생성
-router.post('/api/subject/:subId/:projectId/:feedId', (req, res) => {
+router.post('/api/subject/:subId/:projectId/:feedId/addcomment', (req, res) => {
     const comment = new Comment({
         sub_id: req.params.subId,
         project_id: req.params.projectId,
@@ -231,11 +231,19 @@ router.post('/api/subject/:subId/:projectId/:feedId', (req, res) => {
 })
 
 //코멘트 삭제
-router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, res) => {
+router.delete('/api/:subId/:projectId/:feedId/:commentId/deletecomment'), (req, res) => {
     Comment.findByIdAndDelete({_id: req.params.commentId}, (err, data) => {
         return res.status(200).end();
     })
 }
+
+// 코멘트 조회
+router.get('/api/subject/:subId/:projectId/:feedId/getcomment', (req, res) => {
+    Comment.find({ feed_id: req.params.feedId }, (err, data) => {
+      if (err) return res.status(400).send(err);
+      return res.status(200).json(data);
+    });
+  });
 
 // //채팅 생성
 // router.post('/api/subject/:subId/:projectId/registerchatting'), (req, res) => {
@@ -254,14 +262,21 @@ router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, r
 //     })
 // }
 
+var fileDir = path.dirname(require.main.filename);
 router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
     const email = req.body.email; 
 
     const user = User.find({email: email});
     if (user) {
         const invite_token = crypto.randomBytes(10).toString('hex');
-        const auth_num = Math.random().toString().substr(2,5);
+        const auth_code = Math.random().toString().substr(2,5);
         const user_email = email;
+        let emailTemplete;
+        ejs.renderFile(fileDir+'/template/inviteMail.ejs', 
+        {authCode: auth_code, inviteToken: invite_token}, (err, data) => {
+            if (err) return console.log(err);
+            emailTemplete = data;
+        })
 
         const data = {
             invite_token,
@@ -276,25 +291,25 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
             port: 465,
             secure: true,
             auth: {
-                user: process.env.NODEMAILER_USER,
-                pass: process.env.NODEMAILER_PASS
+                user: 'wykim970@gmail.com',
+                pass: '9016005cyzh!@'
             }
         });
 
         let mailOptions = {
-            from: process.env.NODEMAILER_USER,
+            from: 'wykim970@gmail.com',
             to: email,
             subject: '안녕하세요! pClass에서 진행 중인 프로젝트의 초대 메일입니다.',
-            html: 
-            '<p>안녕하세요! 현재 pClass에서 진행 중인 프로젝트에 초대되셨습니다.</p>'+
-            '<p>프로젝트에 참여하시려면 아래 링크에서 인증번호를 입력해주세요.</p>' +
-            '<a href="http://localhost:4000/api/:subId/:projectId:/auth/invite=${invite_token}">참여하기</a>'
+            html: emailTemplete
+            // '<p>안녕하세요! 현재 pClass에서 진행 중인 프로젝트에 초대되셨습니다.</p>'+
+            // '<p>프로젝트에 참여하시려면 아래 링크에서 인증번호를 입력해주세요.</p>' +
+            // '<a href="http://localhost:4000/api/:subId/:projectId:/auth/invite=${invite_token}">참여하기</a>' +
+            // '<p><b>인증코드: ${auth_num}</b></p>'
         }
 
         transporter.sendMail(mailOptions, (err, data) => {
             if (err) return console.log(err);
-            return res.status(200).json(data);
-            res.send(auth_num);
+            return res.status(200).json({success: true, auth_num, invite_token});
             transporter.close();
         });
     } else return res.status(400).json({success: false})
