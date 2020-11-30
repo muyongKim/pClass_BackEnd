@@ -231,11 +231,12 @@ router.post('/api/subject/:subId/:projectId/:feedId/addcomment', (req, res) => {
 })
 
 //코멘트 삭제
-router.delete('/api/:subId/:projectId/:feedId/:commentId/deletecomment'), (req, res) => {
+router.delete('/api/:commentId/deletecomment', (req, res) => {
     Comment.findByIdAndDelete({_id: req.params.commentId}, (err, data) => {
+        if (err) return res.status(400).send(err);
         return res.status(200).end();
-    })
-}
+    });
+});
 
 // 코멘트 조회
 router.get('/api/subject/:subId/:projectId/:feedId/getcomment', (req, res) => {
@@ -262,7 +263,7 @@ router.get('/api/subject/:subId/:projectId/:feedId/getcomment', (req, res) => {
 //     })
 // }
 
-var fileDir = path.dirname(require.main.filename);
+// 팀원 초대
 router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
     const email = req.body.email; 
 
@@ -271,17 +272,11 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
         const invite_token = crypto.randomBytes(10).toString('hex');
         const auth_code = Math.random().toString().substr(2,5);
         const user_email = email;
-        let emailTemplete;
-        ejs.renderFile(fileDir+'/template/inviteMail.ejs', 
-        {authCode: auth_code, inviteToken: invite_token}, (err, data) => {
-            if (err) return console.log(err);
-            emailTemplete = data;
-        })
 
         const data = {
             invite_token,
             user_email,
-            auth_num
+            auth_code
         }
         InviteAuth.create(data);
 
@@ -300,36 +295,23 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
             from: 'wykim970@gmail.com',
             to: email,
             subject: '안녕하세요! pClass에서 진행 중인 프로젝트의 초대 메일입니다.',
-            html: emailTemplete
-            // '<p>안녕하세요! 현재 pClass에서 진행 중인 프로젝트에 초대되셨습니다.</p>'+
-            // '<p>프로젝트에 참여하시려면 아래 링크에서 인증번호를 입력해주세요.</p>' +
-            // '<a href="http://localhost:4000/api/:subId/:projectId:/auth/invite=${invite_token}">참여하기</a>' +
-            // '<p><b>인증코드: ${auth_num}</b></p>'
+            html: 
+            `<p>안녕하세요! 현재 pClass에서 진행 중인 프로젝트에 초대되셨습니다.</p>`+
+            `<p>프로젝트에 참여하시려면 아래 링크에서 인증번호를 입력해주세요.</p>` +
+            `<a href="http://localhost:4000/api/:subId/:projectId/auth/invite=${invite_token}">참여하기</a>` +
+            `<p><b>인증코드: ${auth_code}</b></p>`
         }
 
         transporter.sendMail(mailOptions, (err, data) => {
-            if (err) return console.log(err);
-            return res.status(200).json({success: true, auth_num, invite_token});
+            if (err) return res.status(400).json(err);
+            return res.json({message: 'Email Sent'});
             transporter.close();
         });
-    } else return res.status(400).json({success: false})
-})
+        return res.status(200).json({success: true, auth_code, invite_token});
+    } else return res.status(400).json(err);
+});
 
-//진행률 DONE
-router.post('/api/subject/:subId/:projectId/progress/DONE'), (req, res) => {
-    Feed.find({$and: [{project_id: req.params.projectId},{status: 2}]}, (err, data) => {
-        if (err) return res.status(400).send(err);
-        return res.status(200).countDocuments(data);
-    })
-}
-
-//진행률 ALL
-router.post('/api/subject/:subId/:projectId/progress/ALL'), (req, res) => {
-    Feed.findById({_id: req.body.projectId}, (err, data) => {
-        if (err) return res.status(400).send(err);
-        return res.status(200).countDocuments(data);
-    })
-}
-
+// 팀원 초대 수락
+// router.get('/api/:subId/:projectId/auth/invite=:invite_token', (req, res))
 
 module.exports = router;
