@@ -315,4 +315,21 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
     } else return res.status(400).json({success: false})
 })
 
+//진행률 DONE
+router.post('/api/subject/:subId/:projectId/progress/DONE'), (req, res) => {
+    Feed.find({$and: [{project_id: req.params.projectId},{status: 2}]}, (err, data) => {
+        if (err) return res.status(400).send(err);
+        return res.status(200).countDocuments(data);
+    })
+}
+
+//진행률 ALL
+router.post('/api/subject/:subId/:projectId/progress/ALL'), (req, res) => {
+    Feed.findById({_id: req.body.projectId}, (err, data) => {
+        if (err) return res.status(400).send(err);
+        return res.status(200).countDocuments(data);
+    })
+}
+
+
 module.exports = router;
