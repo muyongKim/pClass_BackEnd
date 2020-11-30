@@ -153,7 +153,7 @@ router.put('/api/:subId/:projectId/:feedId/modifyfeed', (req, res) => {
         status: req.body.status,
         content: req.body.content
     }, (err, data) => {
-        if (err) return res.json({success: false, err});
+        if (err) return res.status(400).json({success: false, err});
         return res.status(200).json({success: true});
     })
 })
@@ -221,11 +221,12 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
     });
 });
 
+
 // 프로젝트 컨트리뷰터 확인
 router.post('/api/:subId/:projectId/isContributed', (req, res) => {
     Project.findOne({$and: [{_id: req.params.projectId}, {contributor: req.body.email}]}, (err, data) => {
-        if (!data) return res.json(false)
-        return res.json(true);
+        if (!data) return res.status(200).json(false)
+        return res.status(200).json(true);
     })
 })
 
@@ -319,7 +320,5 @@ router.get('/api/auth/invite', (req, res) => {
         return res.status(200).json({success: true, data});
     });
 });
-
-
 
 module.exports = router;
