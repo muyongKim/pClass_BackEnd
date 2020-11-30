@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 const { User } = require("../schema/User");
 const { Subject} = require("../schema/Subject");
 const { Project } = require("../schema/Project");
 const { Feed } = require("../schema/Feed");
 const { Comment } = require("../schema/Comment");
+const { InviteAuth } = require("../schema/InviteAuth");
 
 // 회원가입
 router.post('/api/users/register', (req, res) => {
@@ -209,8 +212,6 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
 
 // 알림 생성, 알림 불러오기, 팀원 초대, 진행률, 참여율
 
-
-
 //코멘트 생성
 router.post('/api/subject/:subId/:projectId/:feedId', (req, res) => {
     const comment = new Comment({
@@ -252,5 +253,51 @@ router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, r
 //         return res.status(200).json(data);
 //     })
 // }
+
+router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
+    const email = req.body.email; 
+
+    const user = User.find({email: email});
+    if (user) {
+        const invite_token = crypto.randomBytes(10).toString('hex');
+        const auth_num = Math.random().toString().substr(2,5);
+        const user_email = email;
+
+        const data = {
+            invite_token,
+            user_email,
+            auth_num
+        }
+        InviteAuth.create(data);
+
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gamil.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.NODEMAILER_USER,
+                pass: process.env.NODEMAILER_PASS
+            }
+        });
+
+        let mailOptions = {
+            from: process.env.NODEMAILER_USER,
+            to: email,
+            subject: '안녕하세요! pClass에서 진행 중인 프로젝트의 초대 메일입니다.',
+            html: 
+            '<p>안녕하세요! 현재 pClass에서 진행 중인 프로젝트에 초대되셨습니다.</p>'+
+            '<p>프로젝트에 참여하시려면 아래 링크에서 인증번호를 입력해주세요.</p>' +
+            '<a href="http://localhost:4000/api/:subId/:projectId:/auth/invite=${invite_token}">참여하기</a>'
+        }
+
+        transporter.sendMail(mailOptions, (err, data) => {
+            if (err) return console.log(err);
+            return res.status(200).json(data);
+            res.send(auth_num);
+            transporter.close();
+        });
+    } else return res.status(400).json({success: false})
+})
 
 module.exports = router;
