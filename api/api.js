@@ -75,6 +75,7 @@ router.post('/api/:subId/project/register', (req, res) => {
         projectname: req.body.projectname,
         projectreadme: req.body.projectreadme,
         leader: req.body.name,
+        contributor: req.body.email,
         sub_id: req.params.subId
     });
     project.save();
@@ -220,6 +221,13 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
     });
 });
 
+router.get('/api/:subId/:projectId/isContributed', (req, res) => {
+    Project.findOne({$and: [{_id: req.params.projectId}, {contributor: req.body.email}]}, (err, data) => {
+        if (!data) return res.json(false)
+        return res.json(true);
+    })
+})
+
 //코멘트 생성
 router.post('/api/subject/:subId/:projectId/:feedId/addcomment', (req, res) => {
     const comment = new Comment({
@@ -253,23 +261,6 @@ router.get('/api/subject/:subId/:projectId/:feedId/getcomment', (req, res) => {
       return res.status(200).json(data);
     });
   });
-
-// //채팅 생성
-// router.post('/api/subject/:subId/:projectId/registerchatting'), (req, res) => {
-//      Project.findByIdAndUpdate({_id: req.params.projectId}, {$set:{username: req.username, content: req.content, time: req.time}}, (err, data)=>{
-//         if (err) return res.json({success: false, err});
-//         return res.status(200).json({success: true});
-//      })
-    
-// }
-
-// //채팅 불러오기 하다맘
-// router.get('/api/subject/:subId/:projectId/showchatting'), (req, res) => {
-//     Project.findById({_id: req.body.projectId}, (err, data) => {
-//         if (err) return res.status(400).send(err);
-//         return res.status(200).json(data);
-//     })
-// }
 
 // 팀원 초대
 router.put('/api/:subId/:projectId/settings/invite', (req, res) => {
@@ -321,10 +312,15 @@ router.put('/api/:subId/:projectId/settings/invite', (req, res) => {
 
 // 팀원 초대 수락
 router.get('/api/auth/invite', (req, res) => {
+    isLoggedin = function(req, res, next) {
+
+    }
     InviteAuth.findOne({auth_code: req.body.auth_code}, (err, data) => {
         if (err) return res.status(400).json(err);
         return res.status(200).json({success: true, data});
     });
 });
+
+
 
 module.exports = router;
