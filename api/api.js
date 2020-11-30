@@ -8,6 +8,7 @@ const { Project } = require("../schema/Project");
 const { Feed } = require("../schema/Feed");
 const { Comment } = require("../schema/Comment");
 const { InviteAuth } = require("../schema/InviteAuth");
+const { nextTick } = require('process');
 
 // 회원가입
 router.post('/api/users/register', (req, res) => {
@@ -210,7 +211,7 @@ router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
 
 // 프로젝트 나가기
 router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
-    Project.findByIdAndUpdate({_id: req.params.projectId}, {$pull: {contributor: req.body.username}}).then(function() {
+    Project.findByIdAndUpdate({_id: req.params.projectId}, {$pull: {contributor: req.body.useremail}}).then(function() {
         User.updateOne({_id: req.body.userId}, 
             {$pull: {p_list: {projectname: req.body.projectname}}},(err, data) => {
             if (err) return res.status(400).send(err);
@@ -271,17 +272,17 @@ router.get('/api/subject/:subId/:projectId/:feedId/getcomment', (req, res) => {
 // }
 
 // 팀원 초대
-router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
+router.put('/api/:subId/:projectId/settings/invite', (req, res) => {
     const email = req.body.email; 
-
     const user = User.find({email: email});
     if (user) {
-        const invite_token = crypto.randomBytes(10).toString('hex');
         const auth_code = Math.random().toString().substr(2,5);
         const user_email = email;
-
+        Project.findByIdAndUpdate({_id: req.params.projectId}, 
+            {$push: {contributor: req.body.email}}, (err, data, next) => {
+                if (err) return res.status(400).json(err);
+        });
         const data = {
-            invite_token,
             user_email,
             auth_code
         }
@@ -299,13 +300,13 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
         });
 
         let mailOptions = {
-            from: 'wykim970@gmail.com',
+            from: 'wykimtest@gmail.com',
             to: email,
             subject: '안녕하세요! pClass에서 진행 중인 프로젝트의 초대 메일입니다.',
             html: 
             `<p>안녕하세요! 현재 pClass에서 진행 중인 프로젝트에 초대되셨습니다.</p>`+
             `<p>프로젝트에 참여하시려면 아래 링크에서 인증번호를 입력해주세요.</p>` +
-            `<a href="http://localhost:4000/api/auth/invite=${invite_token}">참여하기</a>` +
+            `<a href="https://ec2-15-165-236-0.ap-northeast-2.compute.amazonaws.com:4000/api/auth/invite">참여하기</a>` +
             `<p><b>인증코드: ${auth_code}</b></p>`
         }
 
@@ -314,18 +315,15 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
             return res.json({message: 'Email Sent'});
             transporter.close();
         });
-        return res.status(200).json({success: true, auth_code, invite_token});
+        return res.status(200).json({success: true, auth_code});
     } else return res.status(400).json(err);
 });
 
 // 팀원 초대 수락
-router.put('/api/auth/invite=:invite_token', (req, res) => {
-    InviteAuth.findOne({auth_code: req.body.auth_code}).then(function() {
-        Project.findByIdAndUpdate({_id: req.body.projectId},
-        {$push: {contributor: req.body.name}}, (err, data) => {
-            if (err) return res.status(400).json({success: false, err});
-            return res.status(200).json({success: true});
-        })
+router.put('/api/auth/invite', (req, res) => {
+    InviteAuth.findOne({auth_code: req.body.auth_code}, (err, data) => {
+        if (err) return res.status(400).json(err);
+        return res.status(200).json({success: true, data});
     });
 });
 
