@@ -221,7 +221,8 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
     });
 });
 
-router.get('/api/:subId/:projectId/isContributed', (req, res) => {
+// 프로젝트 컨트리뷰터 확인
+router.post('/api/:subId/:projectId/isContributed', (req, res) => {
     Project.findOne({$and: [{_id: req.params.projectId}, {contributor: req.body.email}]}, (err, data) => {
         if (!data) return res.json(false)
         return res.json(true);
@@ -312,9 +313,7 @@ router.put('/api/:subId/:projectId/settings/invite', (req, res) => {
 
 // 팀원 초대 수락
 router.get('/api/auth/invite', (req, res) => {
-    isLoggedin = function(req, res, next) {
-
-    }
+    res.redirect('/api/users/login')
     InviteAuth.findOne({auth_code: req.body.auth_code}, (err, data) => {
         if (err) return res.status(400).json(err);
         return res.status(200).json({success: true, data});
