@@ -231,9 +231,10 @@ router.post('/api/subject/:subId/:projectId/:feedId/addcomment', (req, res) => {
 })
 
 //코멘트 삭제
-router.delete('/api/:subId/:projectId/:feedId/:commentId/deletecomment'), (req, res) => {
+router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, res) => {
     Comment.findByIdAndDelete({_id: req.params.commentId}, (err, data) => {
-        return res.status(200).end();
+        if (err) return res.status(400).send(err);
+        return res.status(204).end();
     })
 }
 
@@ -315,21 +316,37 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
     } else return res.status(400).json({success: false})
 })
 
-//진행률 DONE
-router.post('/api/subject/:subId/:projectId/progress/DONE'), (req, res) => {
-    Feed.find({$and: [{project_id: req.params.projectId},{status: 2}]}, (err, data) => {
-        if (err) return res.status(400).send(err);
-        return res.status(200).countDocuments(data);
-    })
-}
+// //진행률 DONE
+// router.post('/api/subject/:subId/:projectId/progress/DONE'), (req, res) => {
+//     Feed.find({$and: [{project_id: req.params.projectId},{status: 2}]}, (err, data) => {
+//         if (err) return res.status(400).send(err);
+//         return res.status(200).countDocuments(data);
+//     })
+// }
 
-//진행률 ALL
-router.post('/api/subject/:subId/:projectId/progress/ALL'), (req, res) => {
-    Feed.findById({_id: req.body.projectId}, (err, data) => {
-        if (err) return res.status(400).send(err);
-        return res.status(200).countDocuments(data);
-    })
-}
+// //진행률 ALL
+// router.post('/api/subject/:subId/:projectId/progress/ALL'), (req, res) => {
+//     Feed.findById({_id: req.body.projectId}, (err, data) => {
+//         if (err) return res.status(400).send(err);
+//         return res.status(200).countDocuments(data);
+//     })
+// }
+
+// //참여율 1인
+// router.post('/api/subject/:subId/:projectId/participation/individual'), (req,res)=>{
+//     Feed.find({$and: [{project_id: req.params.projectId},{manager: req.params.manager}]}, (err, data) => {
+//         if (err) return res.status(400).send(err);
+//         return res.status(200).countDocuments(data);
+//     })
+// }
+
+// //참여율 ALL
+// router.post('/api/subject/:subId/:projectId/participation/ALL'), (req,res)=>{
+//     Feed.findById({_id: req.body.projectId}, (err, data) => {
+//         if (err) return res.status(400).send(err);
+//         return res.status(200).countDocuments(data);
+//     })
+// }
 
 
 module.exports = router;
