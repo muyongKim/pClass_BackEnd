@@ -205,9 +205,9 @@ router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
         {$set: {'p_list.$.projectname': req.body.modifyname}}, (err, data) => {
             if (err) return res.status(400).send(err);
             res.status(200).json({success: true});
-        })
-    })
-})
+        });
+    });
+});
 
 // 프로젝트 나가기
 router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
@@ -216,9 +216,9 @@ router.put('/api/:subId/:projectId/settings/leaveproject', (req, res) => {
             {$pull: {p_list: {projectname: req.body.projectname}}},(err, data) => {
             if (err) return res.status(400).send(err);
             res.status(200).json({success: true});
-        })
-    })
-})
+        });
+    });
+});
 
 //코멘트 생성
 router.post('/api/subject/:subId/:projectId/:feedId/addcomment', (req, res) => {
@@ -320,7 +320,7 @@ router.put('/api/:subId/:projectId/settings/invite', (req, res) => {
 });
 
 // 팀원 초대 수락
-router.put('/api/auth/invite', (req, res) => {
+router.get('/api/auth/invite', (req, res) => {
     InviteAuth.findOne({auth_code: req.body.auth_code}, (err, data) => {
         if (err) return res.status(400).json(err);
         return res.status(200).json({success: true, data});
