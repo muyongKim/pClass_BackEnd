@@ -1,12 +1,10 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
+const router = express.Router();
 const { User } = require("../schema/User");
 const { Subject} = require("../schema/Subject");
 const { Project } = require("../schema/Project");
 const { Feed } = require("../schema/Feed");
 const { Comment } = require("../schema/Comment");
-
-const router = express.Router();
 
 // 회원가입
 router.post('/api/users/register', (req, res) => {
@@ -140,7 +138,7 @@ router.post('/api/:subId/:projectId/addToDo', (req, res) => {
 })
 
 // 피드 수정
-router.put('/api/:subId/:projectId/:feedId/modifyfeed', (req, res) => {
+router.post('/api/:subId/:projectId/:feedId/modifyfeed', (req, res) => {
     Feed.findByIdAndUpdate({_id: req.params.feedId}, req.body, (err, data) => {
         if (err) return res.json({success: false, err});
         return res.status(200).json({success: true});
@@ -254,7 +252,5 @@ router.delete('/api/:subId/:projectId/:feedId/commentId/deletecomment'), (req, r
 //         return res.status(200).json(data);
 //     })
 // }
-
-
 
 module.exports = router;
