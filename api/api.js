@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const ejs = require('ejs');
-const path = require('path');
 const { User } = require("../schema/User");
 const { Subject} = require("../schema/Subject");
 const { Project } = require("../schema/Project");
@@ -144,7 +142,15 @@ router.post('/api/:subId/:projectId/addToDo', (req, res) => {
 
 // 피드 수정
 router.put('/api/:subId/:projectId/:feedId/modifyfeed', (req, res) => {
-    Feed.findByIdAndUpdate({_id: req.params.feedId}, req.body, (err, data) => {
+    Feed.findByIdAndUpdate({_id: req.params.feedId}, {
+        feedname: req.body.feedname,
+        writer: req.body.writer,
+        manager: req.body.manager,
+        start_date: req.body.start_date,
+        end_date: req.body.end_date,
+        status: req.body.status,
+        content: req.body.content
+    }, (err, data) => {
         if (err) return res.json({success: false, err});
         return res.status(200).json({success: true});
     })
@@ -190,9 +196,10 @@ router.put('/api/:subId/:projectId/feedDragDrop', (req, res) => {
     })
 })
 
-// 프로젝트 이름 수정
+// 프로젝트 이름 & README 수정
 router.put('/api/:subId/:projectId/settings/modifyname', (req, res) => {
-    Project.findByIdAndUpdate({_id: req.params.projectId}, {projectname: req.body.modifyname}).then(function(){
+    Project.findByIdAndUpdate({_id: req.params.projectId}, 
+        {projectname: req.body.modifyname, projectreadme: req.body.modifyreadme}).then(function(){
         User.updateOne({'p_list.projectname': req.body.beforename}, 
         {$set: {'p_list.$.projectname': req.body.modifyname}}, (err, data) => {
             if (err) return res.status(400).send(err);
@@ -286,8 +293,8 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
             port: 465,
             secure: true,
             auth: {
-                user: 'wykim970@gmail.com',
-                pass: '9016005cyzh!@'
+                user: 'wykimtest@gmail.com',
+                pass: '76029766!@'
             }
         });
 
@@ -298,7 +305,7 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
             html: 
             `<p>안녕하세요! 현재 pClass에서 진행 중인 프로젝트에 초대되셨습니다.</p>`+
             `<p>프로젝트에 참여하시려면 아래 링크에서 인증번호를 입력해주세요.</p>` +
-            `<a href="http://localhost:4000/api/:subId/:projectId/auth/invite=${invite_token}">참여하기</a>` +
+            `<a href="http://localhost:4000/api/auth/invite=${invite_token}">참여하기</a>` +
             `<p><b>인증코드: ${auth_code}</b></p>`
         }
 
@@ -312,6 +319,14 @@ router.post('/api/:subId/:projectId/settings/invite', (req, res) => {
 });
 
 // 팀원 초대 수락
-// router.get('/api/:subId/:projectId/auth/invite=:invite_token', (req, res))
+router.put('/api/auth/invite=:invite_token', (req, res) => {
+    InviteAuth.findOne({auth_code: req.body.auth_code}).then(function() {
+        Project.findByIdAndUpdate({_id: req.body.projectId},
+        {$push: {contributor: req.body.name}}, (err, data) => {
+            if (err) return res.status(400).json({success: false, err});
+            return res.status(200).json({success: true});
+        })
+    });
+});
 
 module.exports = router;
