@@ -32,17 +32,19 @@ server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true}));
 
-// CONFIGURE SESSION
-// server.use(session({
-//   secret: 'sid',
-//   resave: false,
-//   saveUninitialized: true,
-//   store: new FileStore()
-// }));
-
 // IMPORT ROUTES
-const route = require('./api/api');
-server.use('/', route);
+const user_router = require('./api/UserApi');
+const subject_router = require('./api/SubjectApi');
+const project_router = require('./api/ProjectApi');
+const feed_router = require('./api/FeedApi');
+const comment_router = require('./api/CommentApi');
+const invite_router = require('./api/InviteApi');
+server.use('/', user_router);
+server.use('/', subject_router);
+server.use('/', project_router);
+server.use('/', feed_router);
+server.use('/', comment_router);
+server.use('/', invite_router);
 
 // RUN SERVER
 server.listen(port, () => console.log(`Listening on port ${port}`));
